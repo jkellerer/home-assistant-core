@@ -113,6 +113,7 @@ async def test_subentry_options(
                 ollama.CONF_MAX_HISTORY: 100,
                 ollama.CONF_NUM_CTX: 32768,
                 ollama.CONF_THINK: True,
+                ollama.CONF_CHAT_OPTIONS: "temperature: 0.65\nnum_thread: 8\n",
             },
         )
     await hass.async_block_till_done()
@@ -125,6 +126,7 @@ async def test_subentry_options(
         ollama.CONF_MAX_HISTORY: 100.0,
         ollama.CONF_NUM_CTX: 32768.0,
         ollama.CONF_THINK: True,
+        ollama.CONF_CHAT_OPTIONS: "temperature: 0.65\nnum_thread: 8\n",
     }
 
 

@@ -15,14 +15,17 @@ from homeassistant.config_entries import ConfigSubentry
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr, llm
 from homeassistant.helpers.entity import Entity
+from homeassistant.util.yaml import parse_yaml
 
 from . import OllamaConfigEntry
 from .const import (
+    CONF_CHAT_OPTIONS,
     CONF_KEEP_ALIVE,
     CONF_MAX_HISTORY,
     CONF_MODEL,
     CONF_NUM_CTX,
     CONF_THINK,
+    DEFAULT_CHAT_OPTIONS,
     DEFAULT_KEEP_ALIVE,
     DEFAULT_MAX_HISTORY,
     DEFAULT_NUM_CTX,
@@ -200,6 +203,15 @@ class OllamaBaseLLMEntity(Entity):
         max_messages = int(settings.get(CONF_MAX_HISTORY, DEFAULT_MAX_HISTORY))
         self._trim_history(message_history, max_messages)
 
+        chat_options = {CONF_NUM_CTX: settings.get(CONF_NUM_CTX, DEFAULT_NUM_CTX)}
+        try:
+            if opts := settings.get(CONF_CHAT_OPTIONS, DEFAULT_CHAT_OPTIONS):
+                opts = parse_yaml(str(opts))
+            if isinstance(opts, dict):
+                chat_options |= opts
+        except HomeAssistantError:
+            _LOGGER.error("Failed parsing chat options, using default values")
+
         # Get response
         # To prevent infinite loops, we limit the number of iterations
         for _iteration in range(MAX_TOOL_ITERATIONS):
@@ -212,7 +224,7 @@ class OllamaBaseLLMEntity(Entity):
                     stream=True,
                     # keep_alive requires specifying unit. In this case, seconds
                     keep_alive=f"{settings.get(CONF_KEEP_ALIVE, DEFAULT_KEEP_ALIVE)}s",
-                    options={CONF_NUM_CTX: settings.get(CONF_NUM_CTX, DEFAULT_NUM_CTX)},
+                    options=chat_options,
                     think=settings.get(CONF_THINK),
                 )
             except (ollama.RequestError, ollama.ResponseError) as err:

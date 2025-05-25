@@ -22,6 +22,7 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.util.ssl import get_default_context
 
 from .const import (
+    CONF_CHAT_OPTIONS,
     CONF_KEEP_ALIVE,
     CONF_MAX_HISTORY,
     CONF_MODEL,
@@ -36,6 +37,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 __all__ = [
+    "CONF_CHAT_OPTIONS",
     "CONF_KEEP_ALIVE",
     "CONF_MAX_HISTORY",
     "CONF_MODEL",
